@@ -1,0 +1,112 @@
+{
+  "state": "READY",
+  "evaluated_at": "2026-11-12T13:32:35.980534Z",
+  "account": {
+    "initialized": true,
+    "version": 4,
+    "cash": "9488.70670936",
+    "btc": "0.00835",
+    "btc_value": "509.561088",
+    "equity": "9998.26779736",
+    "share": "0.05096494",
+    "bid": "61025.28",
+    "valued_at": "2026-11-12T13:32:08.957594Z",
+    "valuation": "VALID",
+    "units": "100",
+    "nav": "99.9826779736",
+    "contributions": "10000",
+    "pnl": "-1.73220264",
+    "paused": false,
+    "reconciliation_failed": false
+  },
+  "run": {
+    "id": "c30c1795-1030-5de9-8b2b-687ed2cd8701",
+    "seq": "2",
+    "state": "RUNNING",
+    "causes": [],
+    "started_at": "2026-11-12T13:30:08.798177Z",
+    "started_by": "OWNER",
+    "start_equity": "9998.87877141",
+    "start_nav": "99.9887877141",
+    "high_water_nav": "99.9887877141",
+    "stopped_at": null,
+    "stop_reason": null,
+    "version": 0,
+    "code_identity": "c9e2e0d0338d76396d6e57ffd5979c826dd8455b47322b6ae140ad0c3b5a9edd",
+    "rule": {
+      "id": "SPOT_RULE_V1",
+      "sha256": "ac8b5e9899855e1d4ab7f3eaf0e1ce34ea462bb9dbf8ba5456dfcb4caf2cfc2a"
+    },
+    "policy": {
+      "id": "SPOT_POLICY_V1",
+      "sha256": "f424c2a0437309536fcc81951e9683ba510effa21fa30c2e551591bbf3ca455c"
+    },
+    "cost": {
+      "id": "SPOT_COST_V1",
+      "sha256": "ae7f8a3610dc13d7e907cc6b47e320c8e4d9645631ec8c63f4cb6be822d2ae05"
+    },
+    "since_start": null
+  },
+  "latches": [],
+  "limits": {
+    "daily_loss": "0.02",
+    "drawdown": "0.08",
+    "today_change": "-0.00017322",
+    "fall_from_high": "0.0000611"
+  },
+  "today": {
+    "utc_date": "2026-11-12",
+    "status": "SPENT",
+    "next_reading_at": "2026-11-13T00:05:00Z",
+    "retry_seconds": 900
+  },
+  "last_reading": {
+    "id": "25014d9f-8eec-5c16-967e-6cc1429d872c",
+    "seq": "2",
+    "run_id": "c30c1795-1030-5de9-8b2b-687ed2cd8701",
+    "utc_date": "2026-11-12",
+    "day_read": "2026-11-11",
+    "at": "2026-11-12T13:30:08.798177Z",
+    "result": "LONG",
+    "reason": null,
+    "close": "60726.19",
+    "signal": "0.333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333",
+    "volatility": "0.32203758654499864731332939678988672316569612440449114545375780198743648326730054468899504673777",
+    "target": "0.051",
+    "held": "0",
+    "action": "BUY",
+    "outcome": "FILLED",
+    "codes": [],
+    "spent": true,
+    "anchors": [
+      {
+        "lookback_days": 30,
+        "day": "2026-10-12",
+        "close": "62220.37000000",
+        "sign": -1
+      },
+      {
+        "lookback_days": 91,
+        "day": "2026-08-12",
+        "close": "48525.61000000",
+        "sign": 1
+      },
+      {
+        "lookback_days": 365,
+        "day": "2025-11-11",
+        "close": "28060.78000000",
+        "sign": 1
+      }
+    ],
+    "up": 2,
+    "fill": {
+      "id": "72d9e516-d201-5689-b6e2-c223569d5fb5",
+      "side": "BUY",
+      "quantity": "0.00835",
+      "price": "61037.413131",
+      "fee": "0.5096624",
+      "gross": "509.66239965"
+    }
+  },
+  "fills": 3
+}

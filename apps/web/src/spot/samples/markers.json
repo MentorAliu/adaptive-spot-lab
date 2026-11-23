@@ -1,0 +1,29 @@
+{
+  "state": "READY",
+  "fills": [
+    {
+      "id": "b63e707b-e173-5c64-84b2-b2255969fbcf",
+      "reason": "RULE_BUY",
+      "side": "BUY",
+      "quantity": "0.00835",
+      "price": "61037.413131",
+      "filled_at": "2026-11-12T13:30:08.666802Z"
+    },
+    {
+      "id": "4caedab2-2cf0-53fd-ba41-3ba836089ad3",
+      "reason": "STOP_SELL",
+      "side": "SELL",
+      "quantity": "0.00835",
+      "price": "61025.19687",
+      "filled_at": "2026-11-12T13:30:08.751839Z"
+    },
+    {
+      "id": "72d9e516-d201-5689-b6e2-c223569d5fb5",
+      "reason": "RULE_BUY",
+      "side": "BUY",
+      "quantity": "0.00835",
+      "price": "61037.413131",
+      "filled_at": "2026-11-12T13:30:08.798177Z"
+    }
+  ]
+}

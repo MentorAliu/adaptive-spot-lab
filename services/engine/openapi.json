@@ -1,0 +1,4429 @@
+{
+  "components": {
+    "schemas": {
+      "AccountView": {
+        "additionalProperties": false,
+        "properties": {
+          "available": {
+            "title": "Available",
+            "type": "string"
+          },
+          "cash": {
+            "title": "Cash",
+            "type": "string"
+          },
+          "contributions": {
+            "title": "Contributions",
+            "type": "string"
+          },
+          "denomination": {
+            "const": "USDT (virtual)",
+            "title": "Denomination",
+            "type": "string"
+          },
+          "equity": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Equity"
+          },
+          "high_water_nav": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "High Water Nav"
+          },
+          "holdings": {
+            "items": {
+              "$ref": "#/components/schemas/HoldingView"
+            },
+            "title": "Holdings",
+            "type": "array"
+          },
+          "id": {
+            "const": 1,
+            "title": "Id",
+            "type": "integer"
+          },
+          "initialized": {
+            "title": "Initialized",
+            "type": "boolean"
+          },
+          "nav": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Nav"
+          },
+          "paused": {
+            "title": "Paused",
+            "type": "boolean"
+          },
+          "pnl": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pnl"
+          },
+          "reconciliation_failed": {
+            "title": "Reconciliation Failed",
+            "type": "boolean"
+          },
+          "reserved": {
+            "title": "Reserved",
+            "type": "string"
+          },
+          "units": {
+            "title": "Units",
+            "type": "string"
+          },
+          "valuation_source": {
+            "enum": [
+              "CASH_ONLY",
+              "PERSISTED_VALUATION",
+              "UNAVAILABLE"
+            ],
+            "title": "Valuation Source",
+            "type": "string"
+          },
+          "valuation_status": {
+            "enum": [
+              "VALID",
+              "UNAVAILABLE"
+            ],
+            "title": "Valuation Status",
+            "type": "string"
+          },
+          "valued_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Valued At"
+          },
+          "version": {
+            "title": "Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "denomination",
+          "initialized",
+          "version",
+          "cash",
+          "reserved",
+          "available",
+          "contributions",
+          "equity",
+          "valuation_status",
+          "valuation_source",
+          "valued_at",
+          "units",
+          "nav",
+          "high_water_nav",
+          "pnl",
+          "paused",
+          "reconciliation_failed",
+          "holdings"
+        ],
+        "title": "AccountView",
+        "type": "object"
+      },
+      "AccountWorkspace": {
+        "additionalProperties": false,
+        "properties": {
+          "account": {
+            "$ref": "#/components/schemas/AccountView"
+          },
+          "funding": {
+            "items": {
+              "$ref": "#/components/schemas/FundingView"
+            },
+            "title": "Funding",
+            "type": "array"
+          }
+        },
+        "required": [
+          "account",
+          "funding"
+        ],
+        "title": "AccountWorkspace",
+        "type": "object"
+      },
+      "BacktestComputed": {
+        "additionalProperties": false,
+        "properties": {
+          "candles_sha256": {
+            "title": "Candles Sha256",
+            "type": "string"
+          },
+          "code_identity": {
+            "title": "Code Identity",
+            "type": "string"
+          },
+          "computed_at": {
+            "title": "Computed At",
+            "type": "string"
+          },
+          "cost": {
+            "$ref": "#/components/schemas/DefinitionRef"
+          },
+          "data": {
+            "$ref": "#/components/schemas/BacktestData"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "instrument": {
+            "$ref": "#/components/schemas/BacktestInstrument"
+          },
+          "label": {
+            "const": "BACKTEST_MODELED_NOT_FILLED",
+            "title": "Label",
+            "type": "string"
+          },
+          "method": {
+            "const": "SPOT_BACKTEST_V1",
+            "title": "Method",
+            "type": "string"
+          },
+          "policy": {
+            "$ref": "#/components/schemas/DefinitionRef"
+          },
+          "rule": {
+            "$ref": "#/components/schemas/DefinitionRef"
+          },
+          "seq": {
+            "title": "Seq",
+            "type": "string"
+          },
+          "start_cash": {
+            "title": "Start Cash",
+            "type": "string"
+          },
+          "windows": {
+            "items": {
+              "$ref": "#/components/schemas/BacktestWindow"
+            },
+            "title": "Windows",
+            "type": "array"
+          }
+        },
+        "required": [
+          "id",
+          "seq",
+          "computed_at",
+          "method",
+          "label",
+          "rule",
+          "policy",
+          "cost",
+          "code_identity",
+          "candles_sha256",
+          "start_cash",
+          "data",
+          "instrument",
+          "windows"
+        ],
+        "title": "BacktestComputed",
+        "type": "object"
+      },
+      "BacktestData": {
+        "additionalProperties": false,
+        "properties": {
+          "days": {
+            "title": "Days",
+            "type": "integer"
+          },
+          "first_day": {
+            "title": "First Day",
+            "type": "string"
+          },
+          "last_day": {
+            "title": "Last Day",
+            "type": "string"
+          },
+          "missing_days": {
+            "title": "Missing Days",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "first_day",
+          "last_day",
+          "days",
+          "missing_days"
+        ],
+        "title": "BacktestData",
+        "type": "object"
+      },
+      "BacktestHold": {
+        "additionalProperties": false,
+        "properties": {
+          "a_year": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "A Year"
+          },
+          "bought": {
+            "title": "Bought",
+            "type": "boolean"
+          },
+          "fees": {
+            "title": "Fees",
+            "type": "string"
+          },
+          "final": {
+            "title": "Final",
+            "type": "string"
+          },
+          "return": {
+            "title": "Return",
+            "type": "string"
+          },
+          "worst_fall": {
+            "title": "Worst Fall",
+            "type": "string"
+          },
+          "worst_fall_day": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Worst Fall Day"
+          },
+          "years": {
+            "items": {
+              "$ref": "#/components/schemas/BacktestYear"
+            },
+            "title": "Years",
+            "type": "array"
+          }
+        },
+        "required": [
+          "final",
+          "return",
+          "a_year",
+          "worst_fall",
+          "worst_fall_day",
+          "fees",
+          "years",
+          "bought"
+        ],
+        "title": "BacktestHold",
+        "type": "object"
+      },
+      "BacktestInstrument": {
+        "additionalProperties": false,
+        "properties": {
+          "max_notional": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Max Notional"
+          },
+          "max_qty": {
+            "title": "Max Qty",
+            "type": "string"
+          },
+          "min_notional": {
+            "title": "Min Notional",
+            "type": "string"
+          },
+          "min_qty": {
+            "title": "Min Qty",
+            "type": "string"
+          },
+          "step_size": {
+            "title": "Step Size",
+            "type": "string"
+          }
+        },
+        "required": [
+          "step_size",
+          "min_qty",
+          "max_qty",
+          "min_notional",
+          "max_notional"
+        ],
+        "title": "BacktestInstrument",
+        "type": "object"
+      },
+      "BacktestRule": {
+        "additionalProperties": false,
+        "properties": {
+          "a_year": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "A Year"
+          },
+          "average_held": {
+            "title": "Average Held",
+            "type": "string"
+          },
+          "buys": {
+            "title": "Buys",
+            "type": "integer"
+          },
+          "daily_loss_days": {
+            "title": "Daily Loss Days",
+            "type": "integer"
+          },
+          "days_in_bitcoin": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Days In Bitcoin"
+          },
+          "fees": {
+            "title": "Fees",
+            "type": "string"
+          },
+          "final": {
+            "title": "Final",
+            "type": "string"
+          },
+          "max_held": {
+            "title": "Max Held",
+            "type": "string"
+          },
+          "refused": {
+            "title": "Refused",
+            "type": "integer"
+          },
+          "return": {
+            "title": "Return",
+            "type": "string"
+          },
+          "sells": {
+            "title": "Sells",
+            "type": "integer"
+          },
+          "stopped": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/BacktestStop"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "worst_fall": {
+            "title": "Worst Fall",
+            "type": "string"
+          },
+          "worst_fall_day": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Worst Fall Day"
+          },
+          "years": {
+            "items": {
+              "$ref": "#/components/schemas/BacktestYear"
+            },
+            "title": "Years",
+            "type": "array"
+          }
+        },
+        "required": [
+          "final",
+          "return",
+          "a_year",
+          "worst_fall",
+          "worst_fall_day",
+          "fees",
+          "years",
+          "buys",
+          "sells",
+          "refused",
+          "days_in_bitcoin",
+          "average_held",
+          "max_held",
+          "stopped",
+          "daily_loss_days"
+        ],
+        "title": "BacktestRule",
+        "type": "object"
+      },
+      "BacktestSeries": {
+        "additionalProperties": false,
+        "properties": {
+          "days": {
+            "items": {
+              "type": "integer"
+            },
+            "title": "Days",
+            "type": "array"
+          },
+          "hold": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Hold",
+            "type": "array"
+          },
+          "rule": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Rule",
+            "type": "array"
+          },
+          "target": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "title": "Target",
+            "type": "array"
+          },
+          "trades": {
+            "items": {
+              "$ref": "#/components/schemas/BacktestTrade"
+            },
+            "title": "Trades",
+            "type": "array"
+          }
+        },
+        "required": [
+          "days",
+          "rule",
+          "hold",
+          "target",
+          "trades"
+        ],
+        "title": "BacktestSeries",
+        "type": "object"
+      },
+      "BacktestStop": {
+        "additionalProperties": false,
+        "properties": {
+          "day": {
+            "title": "Day",
+            "type": "string"
+          },
+          "price": {
+            "title": "Price",
+            "type": "string"
+          }
+        },
+        "required": [
+          "day",
+          "price"
+        ],
+        "title": "BacktestStop",
+        "type": "object"
+      },
+      "BacktestTrade": {
+        "additionalProperties": false,
+        "properties": {
+          "day_ms": {
+            "title": "Day Ms",
+            "type": "integer"
+          },
+          "price": {
+            "title": "Price",
+            "type": "string"
+          },
+          "quantity": {
+            "title": "Quantity",
+            "type": "string"
+          },
+          "side": {
+            "enum": [
+              "BUY",
+              "SELL"
+            ],
+            "title": "Side",
+            "type": "string"
+          }
+        },
+        "required": [
+          "day_ms",
+          "side",
+          "price",
+          "quantity"
+        ],
+        "title": "BacktestTrade",
+        "type": "object"
+      },
+      "BacktestWindow": {
+        "additionalProperties": false,
+        "properties": {
+          "calendar_days": {
+            "title": "Calendar Days",
+            "type": "integer"
+          },
+          "days": {
+            "title": "Days",
+            "type": "integer"
+          },
+          "first_day": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "First Day"
+          },
+          "hold": {
+            "$ref": "#/components/schemas/BacktestHold"
+          },
+          "key": {
+            "enum": [
+              "SINCE_2019",
+              "SINCE_2023",
+              "LAST_12_MONTHS"
+            ],
+            "title": "Key",
+            "type": "string"
+          },
+          "last_day": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Day"
+          },
+          "rule": {
+            "$ref": "#/components/schemas/BacktestRule"
+          }
+        },
+        "required": [
+          "key",
+          "first_day",
+          "last_day",
+          "days",
+          "calendar_days",
+          "rule",
+          "hold"
+        ],
+        "title": "BacktestWindow",
+        "type": "object"
+      },
+      "BacktestYear": {
+        "additionalProperties": false,
+        "properties": {
+          "return": {
+            "title": "Return",
+            "type": "string"
+          },
+          "year": {
+            "title": "Year",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "year",
+          "return"
+        ],
+        "title": "BacktestYear",
+        "type": "object"
+      },
+      "Candle": {
+        "additionalProperties": false,
+        "properties": {
+          "close": {
+            "title": "Close",
+            "type": "string"
+          },
+          "complete": {
+            "title": "Complete",
+            "type": "boolean"
+          },
+          "expected_minutes": {
+            "title": "Expected Minutes",
+            "type": "integer"
+          },
+          "high": {
+            "title": "High",
+            "type": "string"
+          },
+          "low": {
+            "title": "Low",
+            "type": "string"
+          },
+          "minutes": {
+            "title": "Minutes",
+            "type": "integer"
+          },
+          "open": {
+            "title": "Open",
+            "type": "string"
+          },
+          "open_ms": {
+            "title": "Open Ms",
+            "type": "integer"
+          },
+          "volume": {
+            "title": "Volume",
+            "type": "string"
+          }
+        },
+        "required": [
+          "open_ms",
+          "open",
+          "high",
+          "low",
+          "close",
+          "volume",
+          "minutes",
+          "expected_minutes",
+          "complete"
+        ],
+        "title": "Candle",
+        "type": "object"
+      },
+      "Candles": {
+        "additionalProperties": false,
+        "properties": {
+          "candles": {
+            "items": {
+              "$ref": "#/components/schemas/Candle"
+            },
+            "title": "Candles",
+            "type": "array"
+          },
+          "evaluated_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Evaluated At"
+          },
+          "interval": {
+            "enum": [
+              "1m",
+              "5m",
+              "15m",
+              "1h",
+              "4h",
+              "1d"
+            ],
+            "title": "Interval",
+            "type": "string"
+          },
+          "labels": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Labels",
+            "type": "array"
+          },
+          "state": {
+            "enum": [
+              "READY",
+              "SCHEMA_PENDING"
+            ],
+            "title": "State",
+            "type": "string"
+          },
+          "symbol": {
+            "const": "BTCUSDT",
+            "title": "Symbol",
+            "type": "string"
+          }
+        },
+        "required": [
+          "state",
+          "symbol",
+          "interval",
+          "evaluated_at",
+          "candles",
+          "labels"
+        ],
+        "title": "Candles",
+        "type": "object"
+      },
+      "ConfirmFunding": {
+        "additionalProperties": false,
+        "properties": {
+          "amount": {
+            "maxLength": 32,
+            "minLength": 1,
+            "title": "Amount",
+            "type": "string"
+          },
+          "draft_hash": {
+            "maxLength": 64,
+            "minLength": 64,
+            "title": "Draft Hash",
+            "type": "string"
+          },
+          "expected_version": {
+            "minimum": 0.0,
+            "title": "Expected Version",
+            "type": "integer"
+          },
+          "idempotency_key": {
+            "maxLength": 80,
+            "minLength": 8,
+            "title": "Idempotency Key",
+            "type": "string"
+          }
+        },
+        "required": [
+          "amount",
+          "expected_version",
+          "draft_hash",
+          "idempotency_key"
+        ],
+        "title": "ConfirmFunding",
+        "type": "object"
+      },
+      "DefinitionRef": {
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "sha256": {
+            "title": "Sha256",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "sha256"
+        ],
+        "title": "DefinitionRef",
+        "type": "object"
+      },
+      "DraftInput": {
+        "additionalProperties": false,
+        "properties": {
+          "amount": {
+            "maxLength": 32,
+            "minLength": 1,
+            "title": "Amount",
+            "type": "string"
+          }
+        },
+        "required": [
+          "amount"
+        ],
+        "title": "DraftInput",
+        "type": "object"
+      },
+      "FundingDraft": {
+        "additionalProperties": false,
+        "properties": {
+          "account_id": {
+            "const": 1,
+            "title": "Account Id",
+            "type": "integer"
+          },
+          "amount": {
+            "title": "Amount",
+            "type": "string"
+          },
+          "denomination": {
+            "const": "USDT (virtual)",
+            "title": "Denomination",
+            "type": "string"
+          },
+          "draft_hash": {
+            "title": "Draft Hash",
+            "type": "string"
+          },
+          "kind": {
+            "const": "TOPUP",
+            "title": "Kind",
+            "type": "string"
+          },
+          "valuation_status": {
+            "enum": [
+              "VALID",
+              "UNAVAILABLE"
+            ],
+            "title": "Valuation Status",
+            "type": "string"
+          },
+          "version": {
+            "title": "Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "account_id",
+          "amount",
+          "denomination",
+          "kind",
+          "version",
+          "draft_hash",
+          "valuation_status"
+        ],
+        "title": "FundingDraft",
+        "type": "object"
+      },
+      "FundingView": {
+        "additionalProperties": false,
+        "properties": {
+          "amount": {
+            "title": "Amount",
+            "type": "string"
+          },
+          "completed_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Completed At"
+          },
+          "created_at": {
+            "title": "Created At",
+            "type": "string"
+          },
+          "expected_version": {
+            "title": "Expected Version",
+            "type": "integer"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "idempotency_key": {
+            "title": "Idempotency Key",
+            "type": "string"
+          },
+          "issued_units": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Issued Units"
+          },
+          "journal_tx_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Journal Tx Id"
+          },
+          "kind": {
+            "enum": [
+              "INITIALIZE",
+              "TOPUP"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "preflow_nav": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Preflow Nav"
+          },
+          "status": {
+            "enum": [
+              "PENDING_VALUATION",
+              "POSTED",
+              "CANCELED"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "unit_residual": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Unit Residual"
+          }
+        },
+        "required": [
+          "id",
+          "kind",
+          "amount",
+          "status",
+          "idempotency_key",
+          "expected_version",
+          "preflow_nav",
+          "issued_units",
+          "unit_residual",
+          "journal_tx_id",
+          "created_at",
+          "completed_at"
+        ],
+        "title": "FundingView",
+        "type": "object"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail",
+            "type": "array"
+          }
+        },
+        "title": "HTTPValidationError",
+        "type": "object"
+      },
+      "HoldingView": {
+        "additionalProperties": false,
+        "properties": {
+          "asset": {
+            "title": "Asset",
+            "type": "string"
+          },
+          "available": {
+            "title": "Available",
+            "type": "string"
+          },
+          "quantity": {
+            "title": "Quantity",
+            "type": "string"
+          },
+          "reserved": {
+            "title": "Reserved",
+            "type": "string"
+          },
+          "valued": {
+            "title": "Valued",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "asset",
+          "quantity",
+          "reserved",
+          "available",
+          "valued"
+        ],
+        "title": "HoldingView",
+        "type": "object"
+      },
+      "LiveResponse": {
+        "properties": {
+          "status": {
+            "const": "alive",
+            "default": "alive",
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "title": "LiveResponse",
+        "type": "object"
+      },
+      "MarketBook": {
+        "additionalProperties": false,
+        "properties": {
+          "age_seconds": {
+            "title": "Age Seconds",
+            "type": "number"
+          },
+          "ask": {
+            "title": "Ask",
+            "type": "string"
+          },
+          "ask_quantity": {
+            "title": "Ask Quantity",
+            "type": "string"
+          },
+          "asks": {
+            "items": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "title": "Asks",
+            "type": "array"
+          },
+          "bid": {
+            "title": "Bid",
+            "type": "string"
+          },
+          "bid_quantity": {
+            "title": "Bid Quantity",
+            "type": "string"
+          },
+          "bids": {
+            "items": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "title": "Bids",
+            "type": "array"
+          },
+          "received_at": {
+            "title": "Received At",
+            "type": "string"
+          },
+          "second_at": {
+            "title": "Second At",
+            "type": "string"
+          }
+        },
+        "required": [
+          "bid",
+          "bid_quantity",
+          "ask",
+          "ask_quantity",
+          "bids",
+          "asks",
+          "second_at",
+          "received_at",
+          "age_seconds"
+        ],
+        "title": "MarketBook",
+        "type": "object"
+      },
+      "MarketClock": {
+        "additionalProperties": false,
+        "properties": {
+          "checked_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Checked At"
+          },
+          "offset_ms": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Offset Ms"
+          },
+          "uncertainty_ms": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Uncertainty Ms"
+          },
+          "verified": {
+            "title": "Verified",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "verified",
+          "offset_ms",
+          "uncertainty_ms",
+          "checked_at"
+        ],
+        "title": "MarketClock",
+        "type": "object"
+      },
+      "MarketDaily": {
+        "additionalProperties": false,
+        "properties": {
+          "checked_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Checked At"
+          },
+          "days": {
+            "title": "Days",
+            "type": "integer"
+          },
+          "first_day": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "First Day"
+          },
+          "last_day": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Day"
+          }
+        },
+        "required": [
+          "days",
+          "first_day",
+          "last_day",
+          "checked_at"
+        ],
+        "title": "MarketDaily",
+        "type": "object"
+      },
+      "MarketInstrument": {
+        "additionalProperties": false,
+        "properties": {
+          "checked_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Checked At"
+          },
+          "max_notional": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Max Notional"
+          },
+          "max_quantity": {
+            "title": "Max Quantity",
+            "type": "string"
+          },
+          "min_notional": {
+            "title": "Min Notional",
+            "type": "string"
+          },
+          "min_quantity": {
+            "title": "Min Quantity",
+            "type": "string"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "step_size": {
+            "title": "Step Size",
+            "type": "string"
+          },
+          "tick_size": {
+            "title": "Tick Size",
+            "type": "string"
+          },
+          "usable": {
+            "title": "Usable",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "status",
+          "usable",
+          "tick_size",
+          "step_size",
+          "min_quantity",
+          "max_quantity",
+          "min_notional",
+          "max_notional",
+          "checked_at"
+        ],
+        "title": "MarketInstrument",
+        "type": "object"
+      },
+      "MarketView": {
+        "additionalProperties": false,
+        "properties": {
+          "book": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/MarketBook"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "clock": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/MarketClock"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "daily": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/MarketDaily"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "evaluated_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Evaluated At"
+          },
+          "heartbeat_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Heartbeat At"
+          },
+          "history_checked_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "History Checked At"
+          },
+          "instrument": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/MarketInstrument"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "labels": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Labels",
+            "type": "array"
+          },
+          "last_candle_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Candle At"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          },
+          "state": {
+            "enum": [
+              "READY",
+              "SCHEMA_PENDING"
+            ],
+            "title": "State",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "STARTING",
+              "CONNECTED",
+              "DEGRADED",
+              "UNAVAILABLE"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "stream_connected": {
+            "title": "Stream Connected",
+            "type": "boolean"
+          },
+          "symbol": {
+            "const": "BTCUSDT",
+            "title": "Symbol",
+            "type": "string"
+          }
+        },
+        "required": [
+          "state",
+          "symbol",
+          "evaluated_at",
+          "status",
+          "reason",
+          "stream_connected",
+          "heartbeat_at",
+          "book",
+          "last_candle_at",
+          "clock",
+          "instrument",
+          "daily",
+          "history_checked_at",
+          "labels"
+        ],
+        "title": "MarketView",
+        "type": "object"
+      },
+      "ReadingFill": {
+        "additionalProperties": false,
+        "properties": {
+          "fee": {
+            "title": "Fee",
+            "type": "string"
+          },
+          "gross": {
+            "title": "Gross",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "price": {
+            "title": "Price",
+            "type": "string"
+          },
+          "quantity": {
+            "title": "Quantity",
+            "type": "string"
+          },
+          "side": {
+            "enum": [
+              "BUY",
+              "SELL"
+            ],
+            "title": "Side",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "side",
+          "quantity",
+          "price",
+          "fee",
+          "gross"
+        ],
+        "title": "ReadingFill",
+        "type": "object"
+      },
+      "ReadyResponse": {
+        "properties": {
+          "status": {
+            "const": "ready",
+            "default": "ready",
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "title": "ReadyResponse",
+        "type": "object"
+      },
+      "SinceStart": {
+        "additionalProperties": false,
+        "description": "The run against holding Bitcoin, paired by day (ExecPlan 0061): its first and newest timely daily references\nagainst Bitcoin's daily closes at the same midnights.",
+        "properties": {
+          "account": {
+            "title": "Account",
+            "type": "string"
+          },
+          "at": {
+            "title": "At",
+            "type": "string"
+          },
+          "bitcoin": {
+            "title": "Bitcoin",
+            "type": "string"
+          },
+          "from_at": {
+            "title": "From At",
+            "type": "string"
+          },
+          "from_price": {
+            "title": "From Price",
+            "type": "string"
+          },
+          "price": {
+            "title": "Price",
+            "type": "string"
+          }
+        },
+        "required": [
+          "from_at",
+          "from_price",
+          "at",
+          "price",
+          "account",
+          "bitcoin"
+        ],
+        "title": "SinceStart",
+        "type": "object"
+      },
+      "SpotAccount": {
+        "additionalProperties": false,
+        "properties": {
+          "bid": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Bid"
+          },
+          "btc": {
+            "title": "Btc",
+            "type": "string"
+          },
+          "btc_value": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Btc Value"
+          },
+          "cash": {
+            "title": "Cash",
+            "type": "string"
+          },
+          "contributions": {
+            "title": "Contributions",
+            "type": "string"
+          },
+          "equity": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Equity"
+          },
+          "initialized": {
+            "title": "Initialized",
+            "type": "boolean"
+          },
+          "nav": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Nav"
+          },
+          "paused": {
+            "title": "Paused",
+            "type": "boolean"
+          },
+          "pnl": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pnl"
+          },
+          "reconciliation_failed": {
+            "title": "Reconciliation Failed",
+            "type": "boolean"
+          },
+          "share": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Share"
+          },
+          "units": {
+            "title": "Units",
+            "type": "string"
+          },
+          "valuation": {
+            "enum": [
+              "VALID",
+              "UNAVAILABLE"
+            ],
+            "title": "Valuation",
+            "type": "string"
+          },
+          "valued_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Valued At"
+          },
+          "version": {
+            "title": "Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "initialized",
+          "version",
+          "cash",
+          "btc",
+          "btc_value",
+          "equity",
+          "share",
+          "bid",
+          "valued_at",
+          "valuation",
+          "units",
+          "nav",
+          "contributions",
+          "pnl",
+          "paused",
+          "reconciliation_failed"
+        ],
+        "title": "SpotAccount",
+        "type": "object"
+      },
+      "SpotActivity": {
+        "additionalProperties": false,
+        "properties": {
+          "count": {
+            "title": "Count",
+            "type": "integer"
+          },
+          "cursor": {
+            "title": "Cursor",
+            "type": "string"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/SpotTrade"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "state": {
+            "enum": [
+              "READY",
+              "SCHEMA_PENDING"
+            ],
+            "title": "State",
+            "type": "string"
+          }
+        },
+        "required": [
+          "state",
+          "cursor",
+          "count",
+          "items"
+        ],
+        "title": "SpotActivity",
+        "type": "object"
+      },
+      "SpotAnchor": {
+        "additionalProperties": false,
+        "properties": {
+          "close": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Close"
+          },
+          "day": {
+            "title": "Day",
+            "type": "string"
+          },
+          "lookback_days": {
+            "title": "Lookback Days",
+            "type": "integer"
+          },
+          "sign": {
+            "title": "Sign",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "lookback_days",
+          "day",
+          "close",
+          "sign"
+        ],
+        "title": "SpotAnchor",
+        "type": "object"
+      },
+      "SpotBacktest": {
+        "additionalProperties": false,
+        "properties": {
+          "computed": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/BacktestComputed"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "series": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/BacktestSeries"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "state": {
+            "enum": [
+              "READY",
+              "NOT_COMPUTED",
+              "SCHEMA_PENDING"
+            ],
+            "title": "State",
+            "type": "string"
+          },
+          "window": {
+            "enum": [
+              "SINCE_2019",
+              "SINCE_2023",
+              "LAST_12_MONTHS"
+            ],
+            "title": "Window",
+            "type": "string"
+          }
+        },
+        "required": [
+          "state",
+          "window",
+          "computed",
+          "series"
+        ],
+        "title": "SpotBacktest",
+        "type": "object"
+      },
+      "SpotDefinitions": {
+        "additionalProperties": false,
+        "description": "The code's definitions in force, with the running app's code identity (Settings' \"Version\").",
+        "properties": {
+          "code_identity": {
+            "title": "Code Identity",
+            "type": "string"
+          },
+          "cost": {
+            "$ref": "#/components/schemas/DefinitionRef"
+          },
+          "cost_document": {
+            "additionalProperties": true,
+            "title": "Cost Document",
+            "type": "object"
+          },
+          "policy": {
+            "$ref": "#/components/schemas/DefinitionRef"
+          },
+          "policy_document": {
+            "additionalProperties": true,
+            "title": "Policy Document",
+            "type": "object"
+          },
+          "rule": {
+            "$ref": "#/components/schemas/DefinitionRef"
+          },
+          "rule_document": {
+            "additionalProperties": true,
+            "title": "Rule Document",
+            "type": "object"
+          }
+        },
+        "required": [
+          "rule",
+          "policy",
+          "cost",
+          "code_identity",
+          "rule_document",
+          "policy_document",
+          "cost_document"
+        ],
+        "title": "SpotDefinitions",
+        "type": "object"
+      },
+      "SpotLatch": {
+        "additionalProperties": false,
+        "properties": {
+          "cause": {
+            "enum": [
+              "DAILY_LOSS",
+              "DRAWDOWN"
+            ],
+            "title": "Cause",
+            "type": "string"
+          },
+          "latched_at": {
+            "title": "Latched At",
+            "type": "string"
+          }
+        },
+        "required": [
+          "cause",
+          "latched_at"
+        ],
+        "title": "SpotLatch",
+        "type": "object"
+      },
+      "SpotLimits": {
+        "additionalProperties": false,
+        "properties": {
+          "daily_loss": {
+            "title": "Daily Loss",
+            "type": "string"
+          },
+          "drawdown": {
+            "title": "Drawdown",
+            "type": "string"
+          },
+          "fall_from_high": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Fall From High"
+          },
+          "today_change": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Today Change"
+          }
+        },
+        "required": [
+          "daily_loss",
+          "drawdown",
+          "today_change",
+          "fall_from_high"
+        ],
+        "title": "SpotLimits",
+        "type": "object"
+      },
+      "SpotMarker": {
+        "additionalProperties": false,
+        "properties": {
+          "filled_at": {
+            "title": "Filled At",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "price": {
+            "title": "Price",
+            "type": "string"
+          },
+          "quantity": {
+            "title": "Quantity",
+            "type": "string"
+          },
+          "reason": {
+            "enum": [
+              "RULE_BUY",
+              "RULE_SELL",
+              "STOP_SELL"
+            ],
+            "title": "Reason",
+            "type": "string"
+          },
+          "side": {
+            "enum": [
+              "BUY",
+              "SELL"
+            ],
+            "title": "Side",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "reason",
+          "side",
+          "quantity",
+          "price",
+          "filled_at"
+        ],
+        "title": "SpotMarker",
+        "type": "object"
+      },
+      "SpotMarkers": {
+        "additionalProperties": false,
+        "properties": {
+          "fills": {
+            "items": {
+              "$ref": "#/components/schemas/SpotMarker"
+            },
+            "title": "Fills",
+            "type": "array"
+          },
+          "state": {
+            "enum": [
+              "READY",
+              "SCHEMA_PENDING"
+            ],
+            "title": "State",
+            "type": "string"
+          }
+        },
+        "required": [
+          "state",
+          "fills"
+        ],
+        "title": "SpotMarkers",
+        "type": "object"
+      },
+      "SpotOverview": {
+        "additionalProperties": false,
+        "properties": {
+          "account": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SpotAccount"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "evaluated_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Evaluated At"
+          },
+          "fills": {
+            "title": "Fills",
+            "type": "integer"
+          },
+          "last_reading": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SpotReading"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "latches": {
+            "items": {
+              "$ref": "#/components/schemas/SpotLatch"
+            },
+            "title": "Latches",
+            "type": "array"
+          },
+          "limits": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SpotLimits"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "run": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SpotRun"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "state": {
+            "enum": [
+              "READY",
+              "SCHEMA_PENDING"
+            ],
+            "title": "State",
+            "type": "string"
+          },
+          "today": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SpotToday"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "state",
+          "evaluated_at",
+          "account",
+          "run",
+          "latches",
+          "limits",
+          "today",
+          "last_reading",
+          "fills"
+        ],
+        "title": "SpotOverview",
+        "type": "object"
+      },
+      "SpotReading": {
+        "additionalProperties": false,
+        "properties": {
+          "action": {
+            "anyOf": [
+              {
+                "enum": [
+                  "BUY",
+                  "SELL",
+                  "SELL_ALL",
+                  "NO_CHANGE"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Action"
+          },
+          "anchors": {
+            "items": {
+              "$ref": "#/components/schemas/SpotAnchor"
+            },
+            "title": "Anchors",
+            "type": "array"
+          },
+          "at": {
+            "title": "At",
+            "type": "string"
+          },
+          "close": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Close"
+          },
+          "codes": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Codes",
+            "type": "array"
+          },
+          "day_read": {
+            "title": "Day Read",
+            "type": "string"
+          },
+          "fill": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ReadingFill"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "held": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Held"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "outcome": {
+            "enum": [
+              "NOT_READABLE",
+              "NO_CHANGE",
+              "FILLED",
+              "REFUSED"
+            ],
+            "title": "Outcome",
+            "type": "string"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          },
+          "result": {
+            "enum": [
+              "LONG",
+              "CASH",
+              "WARMUP"
+            ],
+            "title": "Result",
+            "type": "string"
+          },
+          "run_id": {
+            "title": "Run Id",
+            "type": "string"
+          },
+          "seq": {
+            "title": "Seq",
+            "type": "string"
+          },
+          "signal": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Signal"
+          },
+          "spent": {
+            "title": "Spent",
+            "type": "boolean"
+          },
+          "target": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Target"
+          },
+          "up": {
+            "title": "Up",
+            "type": "integer"
+          },
+          "utc_date": {
+            "title": "Utc Date",
+            "type": "string"
+          },
+          "volatility": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Volatility"
+          }
+        },
+        "required": [
+          "id",
+          "seq",
+          "run_id",
+          "utc_date",
+          "day_read",
+          "at",
+          "result",
+          "reason",
+          "close",
+          "signal",
+          "volatility",
+          "target",
+          "held",
+          "action",
+          "outcome",
+          "codes",
+          "spent",
+          "anchors",
+          "up",
+          "fill"
+        ],
+        "title": "SpotReading",
+        "type": "object"
+      },
+      "SpotReadingPage": {
+        "additionalProperties": false,
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/SpotReading"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Cursor"
+          },
+          "state": {
+            "enum": [
+              "READY",
+              "SCHEMA_PENDING"
+            ],
+            "title": "State",
+            "type": "string"
+          }
+        },
+        "required": [
+          "state",
+          "items",
+          "next_cursor"
+        ],
+        "title": "SpotReadingPage",
+        "type": "object"
+      },
+      "SpotRequestBody": {
+        "additionalProperties": false,
+        "properties": {
+          "idempotency_key": {
+            "pattern": "^[A-Za-z0-9_-]{8,64}$",
+            "title": "Idempotency Key",
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "PAUSE",
+              "RESUME",
+              "STOP",
+              "START"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "run_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Run Id"
+          }
+        },
+        "required": [
+          "kind",
+          "idempotency_key"
+        ],
+        "title": "SpotRequestBody",
+        "type": "object"
+      },
+      "SpotRequestView": {
+        "additionalProperties": false,
+        "properties": {
+          "answered_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Answered At"
+          },
+          "created_at": {
+            "title": "Created At",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "idempotency_key": {
+            "title": "Idempotency Key",
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "PAUSE",
+              "RESUME",
+              "STOP",
+              "START"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "reasons": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Reasons",
+            "type": "array"
+          },
+          "run_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Run Id"
+          },
+          "status": {
+            "enum": [
+              "PENDING",
+              "APPLIED",
+              "REJECTED"
+            ],
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "kind",
+          "run_id",
+          "idempotency_key",
+          "status",
+          "reasons",
+          "created_at",
+          "answered_at"
+        ],
+        "title": "SpotRequestView",
+        "type": "object"
+      },
+      "SpotRun": {
+        "additionalProperties": false,
+        "properties": {
+          "causes": {
+            "items": {
+              "enum": [
+                "OWNER",
+                "DAILY_LOSS",
+                "DRAWDOWN",
+                "INTEGRITY"
+              ],
+              "type": "string"
+            },
+            "title": "Causes",
+            "type": "array"
+          },
+          "code_identity": {
+            "title": "Code Identity",
+            "type": "string"
+          },
+          "cost": {
+            "$ref": "#/components/schemas/DefinitionRef"
+          },
+          "high_water_nav": {
+            "title": "High Water Nav",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "policy": {
+            "$ref": "#/components/schemas/DefinitionRef"
+          },
+          "rule": {
+            "$ref": "#/components/schemas/DefinitionRef"
+          },
+          "seq": {
+            "title": "Seq",
+            "type": "string"
+          },
+          "since_start": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SinceStart"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "start_equity": {
+            "title": "Start Equity",
+            "type": "string"
+          },
+          "start_nav": {
+            "title": "Start Nav",
+            "type": "string"
+          },
+          "started_at": {
+            "title": "Started At",
+            "type": "string"
+          },
+          "started_by": {
+            "enum": [
+              "SYSTEM",
+              "OWNER"
+            ],
+            "title": "Started By",
+            "type": "string"
+          },
+          "state": {
+            "enum": [
+              "RUNNING",
+              "PAUSED",
+              "STOPPING",
+              "STOPPED"
+            ],
+            "title": "State",
+            "type": "string"
+          },
+          "stop_reason": {
+            "anyOf": [
+              {
+                "enum": [
+                  "OWNER",
+                  "DRAWDOWN"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Stop Reason"
+          },
+          "stopped_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Stopped At"
+          },
+          "version": {
+            "title": "Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "seq",
+          "state",
+          "causes",
+          "started_at",
+          "started_by",
+          "start_equity",
+          "start_nav",
+          "high_water_nav",
+          "stopped_at",
+          "stop_reason",
+          "version",
+          "code_identity",
+          "rule",
+          "policy",
+          "cost",
+          "since_start"
+        ],
+        "title": "SpotRun",
+        "type": "object"
+      },
+      "SpotToday": {
+        "additionalProperties": false,
+        "properties": {
+          "next_reading_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Reading At"
+          },
+          "retry_seconds": {
+            "title": "Retry Seconds",
+            "type": "integer"
+          },
+          "status": {
+            "enum": [
+              "WAITING",
+              "DUE",
+              "RETRYING",
+              "SPENT",
+              "NONE"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "utc_date": {
+            "title": "Utc Date",
+            "type": "string"
+          }
+        },
+        "required": [
+          "utc_date",
+          "status",
+          "next_reading_at",
+          "retry_seconds"
+        ],
+        "title": "SpotToday",
+        "type": "object"
+      },
+      "SpotTrade": {
+        "additionalProperties": false,
+        "properties": {
+          "average_price": {
+            "title": "Average Price",
+            "type": "string"
+          },
+          "book_second": {
+            "title": "Book Second",
+            "type": "string"
+          },
+          "cash_after": {
+            "title": "Cash After",
+            "type": "string"
+          },
+          "fee": {
+            "title": "Fee",
+            "type": "string"
+          },
+          "fee_rate": {
+            "title": "Fee Rate",
+            "type": "string"
+          },
+          "filled_at": {
+            "title": "Filled At",
+            "type": "string"
+          },
+          "gross": {
+            "title": "Gross",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "price": {
+            "title": "Price",
+            "type": "string"
+          },
+          "quantity": {
+            "title": "Quantity",
+            "type": "string"
+          },
+          "quantity_after": {
+            "title": "Quantity After",
+            "type": "string"
+          },
+          "reading": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/TradeReading"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "reason": {
+            "enum": [
+              "RULE_BUY",
+              "RULE_SELL",
+              "STOP_SELL"
+            ],
+            "title": "Reason",
+            "type": "string"
+          },
+          "run_id": {
+            "title": "Run Id",
+            "type": "string"
+          },
+          "run_seq": {
+            "title": "Run Seq",
+            "type": "string"
+          },
+          "seq": {
+            "title": "Seq",
+            "type": "string"
+          },
+          "side": {
+            "enum": [
+              "BUY",
+              "SELL"
+            ],
+            "title": "Side",
+            "type": "string"
+          },
+          "slippage_bps": {
+            "title": "Slippage Bps",
+            "type": "string"
+          },
+          "stop_reason": {
+            "anyOf": [
+              {
+                "enum": [
+                  "OWNER",
+                  "DRAWDOWN"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Stop Reason"
+          }
+        },
+        "required": [
+          "id",
+          "seq",
+          "run_id",
+          "run_seq",
+          "reason",
+          "side",
+          "quantity",
+          "price",
+          "average_price",
+          "slippage_bps",
+          "gross",
+          "fee",
+          "fee_rate",
+          "cash_after",
+          "quantity_after",
+          "filled_at",
+          "book_second",
+          "stop_reason",
+          "reading"
+        ],
+        "title": "SpotTrade",
+        "type": "object"
+      },
+      "SpotTradePage": {
+        "additionalProperties": false,
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/SpotTrade"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Cursor"
+          },
+          "state": {
+            "enum": [
+              "READY",
+              "SCHEMA_PENDING"
+            ],
+            "title": "State",
+            "type": "string"
+          }
+        },
+        "required": [
+          "state",
+          "items",
+          "next_cursor"
+        ],
+        "title": "SpotTradePage",
+        "type": "object"
+      },
+      "SpotValuations": {
+        "additionalProperties": false,
+        "properties": {
+          "base_nav": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Base Nav"
+          },
+          "bucket_seconds": {
+            "title": "Bucket Seconds",
+            "type": "integer"
+          },
+          "points": {
+            "items": {
+              "$ref": "#/components/schemas/ValuationPoint"
+            },
+            "title": "Points",
+            "type": "array"
+          },
+          "since": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Since"
+          },
+          "state": {
+            "enum": [
+              "READY",
+              "SCHEMA_PENDING"
+            ],
+            "title": "State",
+            "type": "string"
+          },
+          "window": {
+            "enum": [
+              "24h",
+              "7d",
+              "all"
+            ],
+            "title": "Window",
+            "type": "string"
+          }
+        },
+        "required": [
+          "state",
+          "window",
+          "bucket_seconds",
+          "since",
+          "base_nav",
+          "points"
+        ],
+        "title": "SpotValuations",
+        "type": "object"
+      },
+      "SystemStatus": {
+        "additionalProperties": false,
+        "description": "Settings' status table (ExecPlan 0060), from recorded facts only.",
+        "properties": {
+          "account": {
+            "default": "unconfigured",
+            "enum": [
+              "unconfigured",
+              "unfunded",
+              "funded"
+            ],
+            "title": "Account",
+            "type": "string"
+          },
+          "backtest": {
+            "default": "not_computed",
+            "enum": [
+              "not_computed",
+              "computed",
+              "unavailable"
+            ],
+            "title": "Backtest",
+            "type": "string"
+          },
+          "denomination": {
+            "const": "USDT (virtual)",
+            "default": "USDT (virtual)",
+            "title": "Denomination",
+            "type": "string"
+          },
+          "execution_worker": {
+            "default": "not_running",
+            "enum": [
+              "not_running",
+              "running"
+            ],
+            "title": "Execution Worker",
+            "type": "string"
+          },
+          "market_data": {
+            "default": "disabled",
+            "enum": [
+              "disabled",
+              "unavailable",
+              "degraded",
+              "ready"
+            ],
+            "title": "Market Data",
+            "type": "string"
+          },
+          "mode": {
+            "const": "PAPER",
+            "default": "PAPER",
+            "title": "Mode",
+            "type": "string"
+          },
+          "trading": {
+            "default": "inactive",
+            "enum": [
+              "inactive",
+              "running",
+              "paused",
+              "stopping",
+              "stopped",
+              "unavailable"
+            ],
+            "title": "Trading",
+            "type": "string"
+          }
+        },
+        "title": "SystemStatus",
+        "type": "object"
+      },
+      "TradeReading": {
+        "additionalProperties": false,
+        "properties": {
+          "anchors": {
+            "title": "Anchors",
+            "type": "integer"
+          },
+          "held": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Held"
+          },
+          "target": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Target"
+          },
+          "up": {
+            "title": "Up",
+            "type": "integer"
+          },
+          "utc_date": {
+            "title": "Utc Date",
+            "type": "string"
+          }
+        },
+        "required": [
+          "utc_date",
+          "target",
+          "held",
+          "up",
+          "anchors"
+        ],
+        "title": "TradeReading",
+        "type": "object"
+      },
+      "UnavailableResponse": {
+        "properties": {
+          "reason": {
+            "const": "database_or_migration_unavailable",
+            "default": "database_or_migration_unavailable",
+            "title": "Reason",
+            "type": "string"
+          },
+          "status": {
+            "const": "not_ready",
+            "default": "not_ready",
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "title": "UnavailableResponse",
+        "type": "object"
+      },
+      "ValidationError": {
+        "properties": {
+          "ctx": {
+            "title": "Context",
+            "type": "object"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "title": "Location",
+            "type": "array"
+          },
+          "msg": {
+            "title": "Message",
+            "type": "string"
+          },
+          "type": {
+            "title": "Error Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError",
+        "type": "object"
+      },
+      "ValuationPoint": {
+        "additionalProperties": false,
+        "properties": {
+          "equity": {
+            "title": "Equity",
+            "type": "string"
+          },
+          "nav": {
+            "title": "Nav",
+            "type": "string"
+          },
+          "time": {
+            "title": "Time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "time",
+          "nav",
+          "equity"
+        ],
+        "title": "ValuationPoint",
+        "type": "object"
+      }
+    }
+  },
+  "info": {
+    "title": "Adaptive Spot Lab private API",
+    "version": "0.0.1"
+  },
+  "openapi": "3.1.0",
+  "paths": {
+    "/v1/account": {
+      "get": {
+        "operationId": "account_v1_account_get",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-Internal-Key",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Internal-Key"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccountView"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Account",
+        "tags": [
+          "account"
+        ]
+      }
+    },
+    "/v1/account/requests/{key}": {
+      "get": {
+        "operationId": "funding_by_key_v1_account_requests__key__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "key",
+            "required": true,
+            "schema": {
+              "title": "Key",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Internal-Key",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Internal-Key"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FundingView"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Funding By Key",
+        "tags": [
+          "account"
+        ]
+      }
+    },
+    "/v1/account/topups": {
+      "post": {
+        "operationId": "topup_v1_account_topups_post",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-Internal-Key",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Internal-Key"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConfirmFunding"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FundingView"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Topup",
+        "tags": [
+          "account"
+        ]
+      }
+    },
+    "/v1/account/topups/draft": {
+      "post": {
+        "operationId": "topup_draft_v1_account_topups_draft_post",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-Internal-Key",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Internal-Key"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DraftInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FundingDraft"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Topup Draft",
+        "tags": [
+          "account"
+        ]
+      }
+    },
+    "/v1/account/topups/{request_id}/cancel": {
+      "post": {
+        "operationId": "cancel_topup_v1_account_topups__request_id__cancel_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "request_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Request Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Internal-Key",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Internal-Key"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FundingView"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Cancel Topup",
+        "tags": [
+          "account"
+        ]
+      }
+    },
+    "/v1/account/topups/{request_id}/retry": {
+      "post": {
+        "operationId": "retry_topup_v1_account_topups__request_id__retry_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "request_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Request Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Internal-Key",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Internal-Key"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FundingView"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Retry Topup",
+        "tags": [
+          "account"
+        ]
+      }
+    },
+    "/v1/account/workspace": {
+      "get": {
+        "operationId": "account_workspace_v1_account_workspace_get",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-Internal-Key",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Internal-Key"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccountWorkspace"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Account Workspace",
+        "tags": [
+          "account"
+        ]
+      }
+    },
+    "/v1/health/live": {
+      "get": {
+        "operationId": "live_v1_health_live_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LiveResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Live",
+        "tags": [
+          "health"
+        ]
+      }
+    },
+    "/v1/health/ready": {
+      "get": {
+        "operationId": "ready_v1_health_ready_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReadyResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnavailableResponse"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "summary": "Ready",
+        "tags": [
+          "health"
+        ]
+      }
+    },
+    "/v1/market": {
+      "get": {
+        "operationId": "market_v1_market_get",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-Internal-Key",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Internal-Key"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MarketView"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Market",
+        "tags": [
+          "market"
+        ]
+      }
+    },
+    "/v1/market/candles": {
+      "get": {
+        "operationId": "market_candles_v1_market_candles_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "interval",
+            "required": false,
+            "schema": {
+              "default": "1d",
+              "enum": [
+                "1m",
+                "5m",
+                "15m",
+                "1h",
+                "4h",
+                "1d"
+              ],
+              "title": "Interval",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 365,
+              "maximum": 1000,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Internal-Key",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Internal-Key"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Candles"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Market Candles",
+        "tags": [
+          "market"
+        ]
+      }
+    },
+    "/v1/spot": {
+      "get": {
+        "operationId": "spot_overview_v1_spot_get",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-Internal-Key",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Internal-Key"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SpotOverview"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Spot Overview",
+        "tags": [
+          "spot"
+        ]
+      }
+    },
+    "/v1/spot/activity": {
+      "get": {
+        "operationId": "spot_activity_v1_spot_activity_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "after",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "pattern": "^(0|[1-9][0-9]{0,18})$",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "After"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Internal-Key",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Internal-Key"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SpotActivity"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Spot Activity",
+        "tags": [
+          "spot"
+        ]
+      }
+    },
+    "/v1/spot/backtest": {
+      "get": {
+        "operationId": "spot_backtest_v1_spot_backtest_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "window",
+            "required": false,
+            "schema": {
+              "default": "SINCE_2019",
+              "enum": [
+                "SINCE_2019",
+                "SINCE_2023",
+                "LAST_12_MONTHS"
+              ],
+              "title": "Window",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Internal-Key",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Internal-Key"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SpotBacktest"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Spot Backtest",
+        "tags": [
+          "spot"
+        ]
+      }
+    },
+    "/v1/spot/definitions": {
+      "get": {
+        "operationId": "spot_definitions_v1_spot_definitions_get",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-Internal-Key",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Internal-Key"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SpotDefinitions"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Spot Definitions",
+        "tags": [
+          "spot"
+        ]
+      }
+    },
+    "/v1/spot/live": {
+      "get": {
+        "description": "The trades as they happen (ExecPlan 0047): ``ready``, then an ``activity`` for each new fill (the toasts' feed\nafter the stream's cursor, which is each event's id) and a ``change`` for the rest.",
+        "operationId": "spot_live_stream_v1_spot_live_get",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Last-Event-ID",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "pattern": "^(0|[1-9][0-9]{0,18})$",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Last-Event-Id"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Internal-Key",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Internal-Key"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "text/event-stream": {
+                "itemSchema": {
+                  "properties": {
+                    "data": {
+                      "type": "string"
+                    },
+                    "event": {
+                      "type": "string"
+                    },
+                    "id": {
+                      "type": "string"
+                    },
+                    "retry": {
+                      "minimum": 0,
+                      "type": "integer"
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Spot Live Stream",
+        "tags": [
+          "spot"
+        ]
+      }
+    },
+    "/v1/spot/markers": {
+      "get": {
+        "operationId": "spot_markers_v1_spot_markers_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "since_ms",
+            "required": true,
+            "schema": {
+              "maximum": 4102444800000,
+              "minimum": 0,
+              "title": "Since Ms",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Internal-Key",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Internal-Key"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SpotMarkers"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Spot Markers",
+        "tags": [
+          "spot"
+        ]
+      }
+    },
+    "/v1/spot/readings": {
+      "get": {
+        "operationId": "spot_readings_v1_spot_readings_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "cursor",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "pattern": "^[1-9][0-9]{0,18}$",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Cursor"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 25,
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Internal-Key",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Internal-Key"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SpotReadingPage"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Spot Readings",
+        "tags": [
+          "spot"
+        ]
+      }
+    },
+    "/v1/spot/requests": {
+      "post": {
+        "operationId": "spot_request_v1_spot_requests_post",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-Internal-Key",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Internal-Key"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SpotRequestBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SpotRequestView"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Spot Request",
+        "tags": [
+          "spot"
+        ]
+      }
+    },
+    "/v1/spot/requests/{key}": {
+      "get": {
+        "operationId": "spot_request_by_key_v1_spot_requests__key__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "key",
+            "required": true,
+            "schema": {
+              "pattern": "^[A-Za-z0-9_-]{8,64}$",
+              "title": "Key",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Internal-Key",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Internal-Key"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SpotRequestView"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Spot Request By Key",
+        "tags": [
+          "spot"
+        ]
+      }
+    },
+    "/v1/spot/trades": {
+      "get": {
+        "operationId": "spot_trades_v1_spot_trades_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "cursor",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "pattern": "^[1-9][0-9]{0,18}$",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Cursor"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 25,
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Internal-Key",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Internal-Key"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SpotTradePage"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Spot Trades",
+        "tags": [
+          "spot"
+        ]
+      }
+    },
+    "/v1/spot/valuations": {
+      "get": {
+        "description": "The account's NAV and equity over the window, newest valuation of each bucket (ExecPlan 0048).",
+        "operationId": "spot_valuations_v1_spot_valuations_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "window",
+            "required": false,
+            "schema": {
+              "default": "all",
+              "enum": [
+                "24h",
+                "7d",
+                "all"
+              ],
+              "title": "Window",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Internal-Key",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Internal-Key"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SpotValuations"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Spot Valuations",
+        "tags": [
+          "spot"
+        ]
+      }
+    },
+    "/v1/system/status": {
+      "get": {
+        "operationId": "system_status_v1_system_status_get",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-Internal-Key",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Internal-Key"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SystemStatus"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "System Status",
+        "tags": [
+          "system"
+        ]
+      }
+    }
+  }
+}

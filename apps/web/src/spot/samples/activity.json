@@ -1,0 +1,82 @@
+{
+  "state": "READY",
+  "cursor": "3",
+  "count": 3,
+  "items": [
+    {
+      "id": "b63e707b-e173-5c64-84b2-b2255969fbcf",
+      "seq": "1",
+      "run_id": "3df29ed6-5420-5fb7-b59a-bbee967932e5",
+      "run_seq": "1",
+      "reason": "RULE_BUY",
+      "side": "BUY",
+      "quantity": "0.00835",
+      "price": "61037.413131",
+      "average_price": "61031.31",
+      "slippage_bps": "1",
+      "gross": "509.66239965",
+      "fee": "0.5096624",
+      "fee_rate": "0.001",
+      "cash_after": "9489.82793795",
+      "quantity_after": "0.00835",
+      "filled_at": "2026-11-12T13:30:08.666802Z",
+      "book_second": "2026-11-12T13:30:08Z",
+      "stop_reason": null,
+      "reading": {
+        "utc_date": "2026-11-12",
+        "target": "0.051",
+        "held": "0",
+        "up": 2,
+        "anchors": 3
+      }
+    },
+    {
+      "id": "4caedab2-2cf0-53fd-ba41-3ba836089ad3",
+      "seq": "2",
+      "run_id": "3df29ed6-5420-5fb7-b59a-bbee967932e5",
+      "run_seq": "1",
+      "reason": "STOP_SELL",
+      "side": "SELL",
+      "quantity": "0.00835",
+      "price": "61025.19687",
+      "average_price": "61031.3",
+      "slippage_bps": "1",
+      "gross": "509.56039386",
+      "fee": "0.5095604",
+      "fee_rate": "0.001",
+      "cash_after": "9998.87877141",
+      "quantity_after": "0",
+      "filled_at": "2026-11-12T13:30:08.751839Z",
+      "book_second": "2026-11-12T13:30:08Z",
+      "stop_reason": "OWNER",
+      "reading": null
+    },
+    {
+      "id": "72d9e516-d201-5689-b6e2-c223569d5fb5",
+      "seq": "3",
+      "run_id": "c30c1795-1030-5de9-8b2b-687ed2cd8701",
+      "run_seq": "2",
+      "reason": "RULE_BUY",
+      "side": "BUY",
+      "quantity": "0.00835",
+      "price": "61037.413131",
+      "average_price": "61031.31",
+      "slippage_bps": "1",
+      "gross": "509.66239965",
+      "fee": "0.5096624",
+      "fee_rate": "0.001",
+      "cash_after": "9488.70670936",
+      "quantity_after": "0.00835",
+      "filled_at": "2026-11-12T13:30:08.798177Z",
+      "book_second": "2026-11-12T13:30:08Z",
+      "stop_reason": null,
+      "reading": {
+        "utc_date": "2026-11-12",
+        "target": "0.051",
+        "held": "0",
+        "up": 2,
+        "anchors": 3
+      }
+    }
+  ]
+}

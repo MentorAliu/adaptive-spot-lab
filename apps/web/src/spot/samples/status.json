@@ -1,0 +1,9 @@
+{
+  "mode": "PAPER",
+  "denomination": "USDT (virtual)",
+  "account": "funded",
+  "market_data": "ready",
+  "trading": "running",
+  "execution_worker": "running",
+  "backtest": "computed"
+}

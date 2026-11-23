@@ -1,0 +1,100 @@
+# Internal paper broker and execution model
+
+## M12: spot market orders on the stored book (ExecPlan 0060), in use
+
+IMPLEMENTED by [ExecPlan 0060 §4.3 and §4.4](../../plans/0060-spot-trading-only.md#43-spot_policy_v1-and-spot_cost_v1) (`app.spot.money`, `app.spot.engine`); VERIFIED in the engine's tests on a scratch PostgreSQL; installed on the owner's PC on 2026-11-12, with no fill yet ([ExecPlan 0060 §14](../../plans/0060-spot-trading-only.md#14-progress)). The sections below are the earlier brokers, kept as history (M11's perpetual and M3 to M10's spot engine are removed).
+
+- **Who trades:** only the execution worker's fenced step, once a second, under the execution lease and the account's fencing epoch: the rule's daily `RULE_BUY` or `RULE_SELL`, and `STOP_SELL` (everything) when a run is stopping. No order is resting: each trade is a market order filled in the step that decides it, or refused with its codes.
+- **The fill** (`SPOT_COST_V1`, [RISK_POLICY](RISK_POLICY.md#m12-spot_policy_v1-spot_rule_v1-and-spot_cost_v1-execplan-0060)): the quantity walks the ten levels of the newest stored book, at most 2 s old (asks for a buy, bids for a sell); 1 bp of slippage moves the walked average price against the account; the fee is 0.10% of the notional, in USDT. A buy's quantity is the target's, cut to what the free USDT pays with its fee and slippage. Quantity down to the lot step (`LOT_SIZE` and `MARKET_LOT_SIZE`), checked against the minimum quantity and the `NOTIONAL` minimum and maximum at the fill price.
+- **Refusals** (stored on the day's reading, the trade not made, tried again at the next 15 minutes): `BOOK_STALE`, `CLOCK_UNVERIFIED` and `INSTRUMENT_UNAVAILABLE` before a fill is planned; `BOOK_UNAVAILABLE`, `SIZE_BELOW_MINIMUM` (below the minimum quantity), `DEPTH_SHORT`, `NOTIONAL_BELOW_MINIMUM`, `NOTIONAL_ABOVE_MAXIMUM` and `CASH_SHORT` from the plan; `BID_STALE` or `VALUATION_UNAVAILABLE` when the account cannot be valued; and for a buy `RUN_NOT_RUNNING` (a run paused by a latch or the owner's Pause, or stopping) or `INTEGRITY`. A sell is never refused for a latch or a pause. A stopping run whose sale cannot be made yet waits (`STOP_SELL_WAITS`, or `STOP_SELL_REFUSED` with the plan's codes) and tries again at the next step.
+- **The step's time** is the database's clock, read inside the fenced transaction after the account's lock; the step reads no book received after it.
+- **Dust:** BTC whose sale of all of it fails the sale's own minimum quantity or notional check at its fill price cannot be sold, and counts as nothing held for a sell-all or a stopping run's sale (the backtest asks the same of its one-level book).
+- **Valuation:** `VALUATION_BID_V1`, the USDT plus the BTC at the best bid of a book at most 5 s old, floored to 8 places; without one the valuation is invalid and nothing is guessed.
+- **Modeled, not filled:** every fill is the stored book's, not an exchange's; the pages show the fills as trades without a disclaimer ([DECISIONS](../../DECISIONS.md#2026-10-30--no-disclaimers-on-the-pages)), and the records keep the book's id, the levels walked, the slippage and the fee.
+- **The backtest** fills at each day's close through the same code on a one-level book at the close (`BACKTEST_MODELED_NOT_FILLED`); it is never a fill of the account.
+
+## Scope and fidelity
+
+Implement a separate `PaperBroker` behind a broker interface, with no live implementation in this release. Market data is real; execution is modeled. Simulator limitations must be reported, not hidden. A broker's own paper-trading documentation notes differences such as market impact and queue position [EV-01](REFERENCES.md#ev-01); this is evidence about limitations, not a dependency on that broker.
+
+The first execution scope is marketable spot buys/sells with explicit quote/depth/cost assumptions. Resting limit orders are deferred until queue/fill assumptions are separately implemented and evaluated. Protective stops are engine trigger policies that generate modeled marketable exits; they are not exchange-hosted guaranteed stops.
+
+## Lifecycle
+
+A proposal is not an order and an order is not a fill. Record intent/proposal and risk outcome, then order state such as `PENDING_VALIDATION`, `REJECTED`, `ACCEPTED`, `PARTIALLY_FILLED`, `FILLED`, `CANCEL_PENDING`, `CANCELED`, `EXPIRED` or `RECONCILIATION_REQUIRED`. Implement an explicit allowed-transition table; terminal states cannot silently reopen. A partially filled canceled order retains its fills.
+
+Every order includes account/experiment, client order ID, strategy/version, original position mandate, side, symbol, requested quantity/notional interpretation, data snapshot, risk policy, cost model and timestamps. Every fill has a unique ID, order linkage, modeled price/quantity/fee, quote/depth provenance, execution rule/version and available-at time.
+
+## Validation before reservation and before fill
+
+Verify mode, universe, symbol status, instrument snapshot, current account/risk policy, data freshness, nonnegative funds/holdings, active execution authority and remaining requested quantity. Respect applicable exchange price/quantity/notional filters; examine current `LOT_SIZE`, `MARKET_LOT_SIZE`, `PRICE_FILTER`, `MIN_NOTIONAL`/`NOTIONAL` definitions and applicability [EX-03](REFERENCES.md#ex-03). In implementation use the verified filter schema, not a hardcoded minimum order size.
+
+Round quantity down to an allowed increment under a documented policy; do not round up past available funds or risk caps. A rounded quantity that fails minimums is a rejected/no-trade outcome, not permission to increase risk. Protect sell quantities against overselling and account for dust explicitly.
+
+## Cost and latency contract
+
+A run requires a versioned approved cost model: commission source/assumption and charging asset, spread handling, latency rule, depth/liquidity rule, slippage/impact scenario and rounding policy. Missing inputs do not silently become zero. Documentation fee examples are not actual fees; Binance labels its examples fictional [EX-04](REFERENCES.md#ex-04).
+
+Because the simulation has no private Binance account access, applicable account fees may remain unverified. The owner may approve an explicit hypothetical fee/cost scenario, and reports must remain labeled conditional on that scenario. Never describe it as the owner's verified exchange fee. Keep multiple sensitivity scenarios separate rather than cherry-picking the most profitable cost estimate.
+
+An eligible marketable buy starts from the available ask side, a sell from bid, at or after the modeled arrival time. Use only liquidity actually observed under the selected depth fidelity; top-of-book data is not unlimited volume. Apply conservative approved consumption/partial-fill rules and residual cancellation behavior. Model spread once; avoid adding it twice under different labels. Historical OHLC-only execution is a lower-fidelity scenario, not the same as quote/depth replay.
+
+## Decision and event ordering
+
+Feature computation uses only data available at decision time. A finalized candle signal executes against the first eligible subsequent observation after the configured arrival delay, never retroactively at an earlier favorable close. The event ordering and tie-breaks must be deterministic and documented.
+
+Process protective exits and already committed obligations before discretionary entries. When multiple entry intents compete for remaining risk/cash, use the approved allocation and deterministic tie-break policy rather than worker arrival order. Include a stable symbol/strategy ordering for otherwise equal intents. One active main execution authority prevents races; independent shadows have separate balances.
+
+## Failure behavior
+
+A fresh-data failure blocks fills as well as new entries; it does not invent a liquidation price. Record unresolved exit intent and the gap. After recovery, use the next valid observation under the frozen rule and disclose missed/offline intervals. Never manufacture a stop fill at its trigger price after price has gapped through it.
+
+Database timeout/unknown commit requires reconciliation by idempotency keys before retrying. A worker restart reloads orders/reservations and obtains a new fenced execution lease. Stale holders cannot commit. Agent retries cannot duplicate orders.
+
+## Minimum acceptance evidence
+
+Test real arithmetic and state transitions under partial fills, rounding/minimums, insufficient funds, sell dust, duplicate/out-of-order events, late quotes, fee assets, disconnects, restart, lost acknowledgments and two concurrent workers. Reconcile order totals to fill totals and fills to journal postings. Tests use labeled fixtures; a fixture passing is not proof of realistic market execution.
+
+## M3 implementation (ExecPlan 0011)
+
+IMPLEMENTED in [ExecPlan 0011](../plans/0011-paper-broker-reference.md); acceptance evidence is recorded there and in [COMMANDS](../COMMANDS.md).
+
+- **Order sources.** Only SYSTEM creates orders: `TREND_REFERENCE_V1` entries and trend exits, and deterministic protection (protective stop, 72 h time exit). No HTTP route creates, cancels or changes an order. Main-account activation is structurally blocked in M3; only a guarded fixture provider (`OFFLINE_TEST`, disposable `asl_m1_` databases) and the isolated replay (`HISTORICAL_RESEARCH`, `asl_m1_replay_*`) can activate. The run reference required by the lifecycle above is a nullable column that M4 constrains.
+- **Execution fidelity `SAMPLED_L1_TICKER`.** Sampled 1-second level-1 quotes are not guaranteed executable prices; they are the approved *modeled* execution input. Orders are immediate-or-cancel against one eligible quote after the arrival delay: buys at the ask, sells at the bid (spread counted once), adverse slippage then adverse tick rounding, at most `participation` of the displayed best-level quantity minus quantity this account already consumed at that level. A zero fill expires; a partial fill becomes `PARTIALLY_FILLED` then `CANCELED` (`IOC_REMAINDER`) in the same step.
+- **Candidates.** A quote is eligible when its source and availability times are at or after arrival, its source time is newer than the last accepted one for the symbol, it is fresh (≤ 5 s) when processed and, for entries, its source time is not after `fill_deadline`. Stale candidates after downtime are skipped; nothing fills retroactively.
+- **Entries.** `p_max = ceil_tick(entry_reference × (1 + envelope))`; an entry expires with no fill on `ENVELOPE_EXCEEDED`, `STOP_ALREADY_CROSSED` (bid ≤ stop at the fill snapshot) or `NO_ELIGIBLE_QUOTE`. `NO_ELIGIBLE_QUOTE` and `ZERO_LIQUIDITY` may be retried (at most three attempts, each re-sized on a later snapshot) while the signal is valid; every other reason is final.
+- **Exits.** One exit obligation per position (precedence `PROTECTIVE_STOP > TIME_EXIT > TREND_EXIT`; later reasons recorded as suppressed). Obligations issue follow-up IOC sells of `floor_step(min(position quantity, free holdings))` until the position closes or only unsellable dust remains (`CLOSED_WITH_DUST`).
+- **Commission** is charged in the received asset (buy→base, sell→USDT) and rounded up to the instrument commission precision. Cost parameters come from a hashed cost scenario; the main account is `UNSET`, which blocks every non-fixture order and fill.
+- **Filters** are taken from the decision-time instrument snapshot and revalidated against the fill quote's snapshot; the stricter wins. See [FILTER_POLICY_V1 in ExecPlan 0011 §5.5](../plans/0011-paper-broker-reference.md#55-filters-rounding-and-dust).
+- **Ordering.** One fenced step per publication (or timer): fills (exits first) → entry expiries → stop/time triggers → strategy evaluations (trend exits before entries) → exit orders → valuation, references, latches, breaches → entries in symbol priority → signal housekeeping. Ties break by publication sequence, symbol, then client order id.
+- **Identifiers** (orders, fills, journals, mandates, evaluations, decisions) are UUIDv5 over canonical keys, so the same inputs produce the same rows; `recorded_at` columns are excluded from fingerprints.
+- **Replay execution ([ExecPlan 0017](../plans/0017-replay-throughput.md)).** The isolated replay (`HISTORICAL_RESEARCH`) and disposable fixture runs may use a fast path; the forward engine never does and keeps one fenced transaction per step, with its state read inside that transaction.
+  - **Batched transactions.** Consecutive steps may share one fenced transaction. Authority is checked when the batch opens and immediately before its COMMIT, and the checkpoint is written once per batch. `synchronous_commit` is off for that transaction only.
+  - **State reuse.** State reads are reused between steps until the engine writes a table they depend on.
+  - **Since [ExecPlan 0025](../plans/0025-research-job-cost-and-search.md)**, with state reuse only, each behind its own switch:
+    - **Held writes.** A batch holds a step's valuation insert, NAV update and step insert and sends them together, the rows of a table in the order they were issued, before any other statement of its transaction and before its COMMIT.
+    - **Quiet stretches.** While nothing is open, held or waiting, the driver records the publications up to the next one that must be handed to the engine (a final candle, a confirmation, a quote without usable times, or the engine's next time bound) from two reads of the database instead of handing each over.
+    - **A step that can do nothing is not taken.** While something is held, a quote of a symbol the account neither holds nor has anything open in is such a step when every read it would reuse is there, nothing is due by time, and every held symbol's quote is the one the last step saw. It is still counted as a step, and its checkpoint is set.
+    - **Kept answers.** The breach check's answer is kept for an equal portfolio, scenario and ticks, and its planned open risk while positions, pending entries, scenario and ticks are equal.
+  - **Unchanged results.** Each step's phase order, inputs and decisions are the same as a per-step run's: identical fingerprints and step traces. A step that is not taken, and a publication that is not handed over, is one that writes nothing and decides nothing in a per-step run.
+  - **Verification.** The report records the engine mode, and a verification mode compares every reused read and every kept answer with the database or the computation it replaced, hands a quiet stretch over one publication at a time, and takes every step that was foretold to do nothing; any difference fails the run.
+  - **M4 owner controls.** In a replay, each timed owner request first commits the open batch; a present experiment is loaded and locked in every step, as in a per-step run.
+
+
+## M4 changes (ExecPlan 0015)
+
+- **Activation.** MAIN orders need an activated, RUNNING experiment whose manifest hashes the owner approved, with no latched pause cause and no pending pause, flatten or stop request. The engine checks this inside every fenced step. The cost scenario comes from the manifest; the environment cannot name one for MAIN. Forward orders and mandates carry `run_id`.
+- **Owner flatten.** `OWNER_FLATTEN` is an exit origin and obligation reason ranked just below `PROTECTIVE_STOP`. It uses the M3 follow-up IOC and dust rules; a stop crossing seen in the same step keeps the obligation and records the flatten as suppressed, so nothing is sold twice.
+- **Exits never depend on controls.** Pause, stop, flatten and approval revocation cancel unfilled entries; exits are limited only by data, holdings and filters.
+
+## M11: the simulated BTCUSDT perpetual (ExecPlan 0039)
+
+IMPLEMENTED in update 2, part B (`app.futures`; [ExecPlan 0039 §5.3.1](../plans/0039-bitcoin-futures-on-paper.md#531-part-bs-design-2026-10-24)). With `ASL_EXECUTION_ENGINE` `FUTURES` (the default) the execution worker runs the futures engine instead of the spot one, under the same lease and fencing epoch; the spot broker stays in the code, unused, until update 3. NOT RUN on the owner's PC until the update is installed.
+
+- **Fidelity `FUTURES_COST_V1`.** Market orders only, against the five levels a side of the newest stored quote at most 2,000 ms old (the partial depth stream, [MARKET_DATA](MARKET_DATA.md#m11-update-2-part-a-the-btcusdt-perpetual-execplan-0039)); the walked average plus a labeled 1 bps adverse slippage scenario (not an observed value), rounded against the order; quantity rounded down to the step. Taker fee 0.05%, read from Binance's fee table (Regular User, USDT) on 2026-10-24, no BNB discount; BTCUSDT's first maintenance tier (0 to 300,000 notional, rate 0.40%, amount 0), read from Binance's leverage and margin table the same day; a notional above it is refused. Sources and read times are in the definition and in [INTEGRATION_EVIDENCE](INTEGRATION_EVIDENCE.md#execplan-0039-part-b-the-futures-account-and-pages--2026-10-24).
+- **Liquidation price.** Binance's isolated-margin formula for one-way mode, with the position's margin as its wallet balance, fixed at entry: long `(Q × entry − margin − amount) ÷ (Q × (1 − rate))`, short `(Q × entry + margin + amount) ÷ (Q × (1 + rate))`, rounded toward the entry. The position is liquidated when the mark is at or beyond it, losing its whole margin; an exit fill at or beyond it is a liquidation too, so an isolated position loses at most its margin.
+- **The step, every second, in one fenced transaction:** (1) the owner's requests, each answered once; (2) the first run, by itself, once the account is funded; (3) funding: each funding time a position was open at is recorded, and posted once the settled rate is read (a time the mark announced while it was open; or, through a stretch without marks, a settled rate's time, placed at its nearest whole minute because Binance stamps it a few milliseconds late); (4) protection: liquidation on the mark, then the stop (a long's on the bid, a short's on the ask), the take-profit, the time exit and the owner's close, on the newest quote at most 2 s old; (5) the valuation, the day's reference and the latches; (6) the run's state; (7) the trader's decisions, each answered once. Protection runs whatever the run's state, the agents or a pause; it needs only the engine and fresh data (rule 11).
+- **No fresh quote, no fill.** An entry is refused (`QUOTE_STALE`); an exit waits and its incident is recorded at most every 5 minutes while the condition lasts (`QUOTE_STALE`, `EXIT_DEPTH_SHORT` when the five levels hold less than the position, `MARK_STALE`). A gapped stop fills at the book, so it can lose more than planned; nothing fills at the trigger price after a gap.
+- **Answers to the trader** (`futures_decision_answers`): `FILLED`, `APPLIED` (a tighter stop), `NOTED` (hold or abstain) or `REFUSED` with codes. Any decision: `POLICY_CHANGED`, `DECISION_STALE`, `DECISION_AHEAD` (its context more than 5 s ahead of the engine's clock). An exit or a tightening: `POSITION_CHANGED`, `QUOTE_STALE`, `EXIT_UNFILLED`; a tightening also `INSTRUMENT_UNAVAILABLE`, `ATR_UNAVAILABLE`, `NOT_TIGHTER`. An entry: `RUN_NOT_RUNNING`, `RUN_CHANGED`, `POSITION_OPEN`, then together `INTEGRITY`, `ACCOUNT_CHANGED` (a position closed after the decision's context), `ENTRY_LIMIT`, `COOLDOWN`, `QUOTE_STALE`, `MARK_STALE`, `INSTRUMENT_UNAVAILABLE`, `VALUATION_UNAVAILABLE`, `ATR_UNAVAILABLE`, and the sizing refusals of [RISK_POLICY](RISK_POLICY.md#m11-futures_policy_v1-execplan-0039). An exit or a tighter stop is taken in any run state while the position is open.
+- **The owner's requests** (`futures_owner_requests`, written by the API, applied by the engine): `PAUSE` and `RESUME` (cause `OWNER`), `STOP` with or without closing the position at once (`OWNER_STOP` exit), and `START` after a stopped run. Each is answered `APPLIED` or `REJECTED` with reasons, once.
+- **Identifiers** of runs, positions, fills, ledger events and journals are UUIDv5 over their sources, so a retried step writes the same rows or none.

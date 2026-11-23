@@ -1,0 +1,20 @@
+.git
+**/node_modules
+.pnpm-store
+**/.venv
+**/__pycache__
+**/.pytest_cache
+**/.ruff_cache
+**/.tanstack
+**/.output
+**/dist
+**/.env
+**/.env.*
+playwright-report
+test-results
+secrets
+.cache
+# Authoring instruction files never enter any image (ExecPlan 0020, R11); nor do authoring skills (rule 10).
+**/AGENTS.md
+**/CLAUDE.md
+.claude

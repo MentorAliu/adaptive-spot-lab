@@ -1,0 +1,13 @@
+{
+  "name": "adaptive-spot-lab",
+  "private": true,
+  "packageManager": "pnpm@10.28.2",
+  "scripts": {
+    "lint": "pnpm --filter web lint",
+    "typecheck": "pnpm --filter web typecheck",
+    "test:unit": "pnpm --filter web test:unit",
+    "build": "pnpm --filter web build",
+    "api:generate": "pnpm --filter web api:generate",
+    "api:check": "pnpm --filter web api:check"
+  }
+}

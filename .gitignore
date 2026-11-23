@@ -1,0 +1,21 @@
+**/node_modules/
+.pnpm-store/
+**/.venv/
+**/__pycache__/
+**/.pytest_cache/
+**/.ruff_cache/
+**/.tanstack/
+**/.output/
+**/dist/
+**/*.tsbuildinfo
+**/.env
+**/.env.*
+!.env.example
+playwright-report/
+test-results/
+secrets/
+.cache/
+# The update starter the thread puts in the owner's app folder (a copy of tools/update.cmd).
+/update-app.cmd
+# The Docker clean-up starter the thread puts in the owner's app folder (a copy of tools/docker-cleanup.cmd).
+/docker-cleanup.cmd

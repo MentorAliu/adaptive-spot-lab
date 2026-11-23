@@ -1,0 +1,280 @@
+name: adaptive-spot-lab
+
+services:
+  postgres:
+    image: postgres:17.11-alpine3.24
+    cpus: 2.0
+    mem_limit: 2g
+    pids_limit: 256
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    environment:
+      POSTGRES_USER: asl
+      POSTGRES_DB: ${ASL_DB_NAME:-asl}
+      POSTGRES_PASSWORD_FILE: /run/secrets/postgres_password
+    secrets:
+      - postgres_password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - private
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U asl -d ${ASL_DB_NAME:-asl}"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+    restart: unless-stopped
+
+  migrate:
+    build:
+      context: .
+      dockerfile: services/engine/Dockerfile
+      target: runtime
+    command: ["alembic", "-c", "/app/alembic.ini", "upgrade", "head"]
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    environment:
+      ASL_DB_HOST: postgres
+      ASL_DB_NAME: ${ASL_DB_NAME:-asl}
+      ASL_DB_ROLE: migration
+    secrets:
+      - postgres_password
+      - api_db_password
+      - market_worker_password
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - private
+    read_only: true
+    tmpfs:
+      - /tmp
+    restart: "no"
+
+  api:
+    build:
+      context: .
+      dockerfile: services/engine/Dockerfile
+      target: runtime
+    cpus: 1.0
+    mem_limit: 512m
+    pids_limit: 128
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    environment:
+      ASL_DB_HOST: postgres
+      ASL_DB_NAME: ${ASL_DB_NAME:-asl}
+    secrets:
+      - api_db_password
+      - api_internal_key
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    networks:
+      - private
+    read_only: true
+    tmpfs:
+      - /tmp
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/v1/health/ready', timeout=2).read()"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+    restart: unless-stopped
+
+  market-worker:
+    profiles: ["market"]
+    build:
+      context: .
+      dockerfile: services/engine/Dockerfile
+      target: runtime
+    # ExecPlan 0060: Bitcoin's spot feed (app.spot_market) from Binance's market-data-only hosts. It writes the
+    # spot market tables only; ASL_MARKET_ENABLED=0 keeps it idle.
+    command: ["python", "-m", "app.spot_market.worker"]
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    environment:
+      ASL_DB_HOST: postgres
+      ASL_DB_NAME: ${ASL_DB_NAME:-asl}
+      ASL_MARKET_ENABLED: ${ASL_MARKET_ENABLED:-0}
+    secrets:
+      - market_worker_password
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    networks:
+      - private
+      - market_egress
+    read_only: true
+    tmpfs:
+      - /tmp
+    cpus: 1.0
+    mem_limit: 512m
+    pids_limit: 128
+    restart: unless-stopped
+
+  execution-worker:
+    # Paper execution authority: the spot account's engine and its backtest (ExecPlan 0060, app.spot). It acts only
+    # with ASL_EXECUTION_ENABLED=1 and an execution identity that can log in (the owner's M4-B activation gave it
+    # its login); otherwise it idles. unless-stopped: Docker documents that on-failure does not restart after a
+    # daemon restart; a disabled worker idles instead of exiting (OD-11).
+    profiles: ["execution"]
+    build:
+      context: .
+      dockerfile: services/engine/Dockerfile
+      target: runtime
+    command: ["python", "-m", "app.execution.worker"]
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    environment:
+      ASL_DB_HOST: postgres
+      ASL_DB_NAME: ${ASL_DB_NAME:-asl}
+      ASL_DB_ROLE: execution
+      ASL_EXECUTION_ENABLED: ${ASL_EXECUTION_ENABLED:-0}
+    secrets:
+      - execution_db_password
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    networks:
+      - private
+    read_only: true
+    tmpfs:
+      - /tmp
+    cpus: 1.0
+    mem_limit: 512m
+    pids_limit: 128
+    healthcheck:
+      test: ["CMD", "python", "-m", "app.execution.health"]
+      interval: 5s
+      timeout: 3s
+      retries: 6
+    restart: unless-stopped
+
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+      target: runtime
+    cpus: 1.0
+    mem_limit: 512m
+    pids_limit: 128
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    environment:
+      ASL_API_BASE_URL: http://api:8000
+    secrets:
+      - api_internal_key
+    depends_on:
+      api:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:${WEB_PORT:-3000}:3000"
+    networks:
+      - frontend
+      - private
+    read_only: true
+    tmpfs:
+      - /tmp
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+    restart: unless-stopped
+
+  web-tools:
+    profiles: ["tools"]
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+      target: source
+    working_dir: /workspace
+    entrypoint: []
+    command: ["pnpm", "--filter", "web", "typecheck"]
+    network_mode: none
+
+  engine-tools:
+    profiles: ["tools"]
+    build:
+      context: .
+      dockerfile: services/engine/Dockerfile
+      target: test
+    entrypoint: []
+    command: ["uv", "run", "--frozen", "ruff", "check", "."]
+    network_mode: none
+
+  engine-tests:
+    profiles: ["test"]
+    cpus: 1.0
+    mem_limit: 512m
+    pids_limit: 128
+    build:
+      context: .
+      dockerfile: services/engine/Dockerfile
+      target: test
+    environment:
+      ASL_DB_HOST: postgres
+      ASL_DB_NAME: ${ASL_DB_NAME:-asl}
+      ASL_TEST_ISOLATED: ${ASL_TEST_ISOLATED:-0}
+    secrets:
+      - postgres_password
+      - api_db_password
+      - api_internal_key
+      - market_worker_password
+      - execution_db_password
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    networks:
+      - private
+    entrypoint: []
+    command: ["uv", "run", "--frozen", "python", "-m", "pytest", "-q"]
+
+secrets:
+  api_internal_key:
+    file: ${ASL_SECRET_DIR:-./secrets}/api_internal_key
+  postgres_password:
+    file: ${ASL_SECRET_DIR:-./secrets}/postgres_password
+  api_db_password:
+    file: ${ASL_SECRET_DIR:-./secrets}/api_db_password
+  market_worker_password:
+    file: ${ASL_SECRET_DIR:-./secrets}/market_worker_password
+  execution_db_password:
+    file: ${ASL_SECRET_DIR:-./secrets}/execution_db_password
+
+volumes:
+  postgres_data:
+
+networks:
+  frontend:
+    ipam:
+      config:
+        - subnet: ${ASL_FRONTEND_SUBNET:-10.241.26.0/27}
+  private:
+    internal: true
+    ipam:
+      config:
+        - subnet: ${ASL_PRIVATE_SUBNET:-10.241.26.32/27}
+  market_egress:
+    ipam:
+      config:
+        - subnet: ${ASL_MARKET_EGRESS_SUBNET:-10.241.26.128/27}
